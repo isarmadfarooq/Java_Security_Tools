@@ -1,0 +1,15 @@
+com\mycompany\securitychecker\report\ReportGenerator$1.class
+com\mycompany\securitychecker\model\Severity.class
+com\mycompany\securitychecker\rules\HardCodedCredentialsRule.class
+com\mycompany\securitychecker\report\ReportGenerator.class
+com\mycompany\securitychecker\rules\SqlInjectionRule$1.class
+com\mycompany\securitychecker\rules\CommandInjectionRule$1.class
+com\mycompany\securitychecker\rules\SecurityRule.class
+com\mycompany\securitychecker\analyzer\CodeAnalyzer.class
+com\mycompany\securitychecker\model\Issue.class
+com\mycompany\securitychecker\report\ReportFormat.class
+com\mycompany\securitychecker\rules\CommandInjectionRule.class
+com\mycompany\securitychecker\rules\SqlInjectionRule.class
+com\mycompany\securitychecker\analyzer\JavaSourceParser.class
+com\mycompany\securitychecker\rules\HardCodedCredentialsRule$1.class
+com\mycompany\securitychecker\analyzer\TaintAnalysisEngine.class
