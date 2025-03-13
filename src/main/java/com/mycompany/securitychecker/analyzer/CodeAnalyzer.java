@@ -29,6 +29,8 @@ public class CodeAnalyzer {
         rules.add(new CommandInjectionRule());
         rules.add(new HardCodedCredentialsRule());
         // Additional rules can be added here
+
+        System.out.println("✅ Security rules initialized: " + rules.size());
     }
 
     /**
@@ -37,35 +39,54 @@ public class CodeAnalyzer {
      * @return A list of Issues found across all files
      */
     public List<Issue> analyzeDirectory(String directoryPath) {
-        List<Issue> allIssues = new ArrayList<>();
+        System.out.println("\n📂 Scanning directory: " + directoryPath);
 
+        List<Issue> allIssues = new ArrayList<>();
         File dir = new File(directoryPath);
+
         if (!dir.exists() || !dir.isDirectory()) {
-            System.err.println("Invalid directory: " + directoryPath);
+            System.err.println("❌ Error: Invalid directory - " + directoryPath);
             return allIssues;
         }
 
-        // Process each .java file in the directory
         File[] files = dir.listFiles((d, name) -> name.endsWith(".java"));
+        System.out.println("🔍 Found Java Files: " + (files == null ? "None" : files.length));
+
         if (files == null || files.length == 0) {
-            System.err.println("No .java files found in directory: " + directoryPath);
+            System.err.println("⚠️ No .java files found in: " + directoryPath);
             return allIssues;
         }
 
         for (File file : files) {
+            System.out.println("📄 Analyzing file: " + file.getName());
+
+            // Parse Java file
             CompilationUnit cu = parser.parse(file);
-            if (cu != null) {
-                // Apply each security rule
-                for (SecurityRule rule : rules) {
-                    List<Issue> issues = rule.analyze(cu, file.getName());
+            if (cu == null) {
+                System.err.println("❌ Failed to parse: " + file.getName());
+                continue;
+            }
+
+            System.out.println("✅ Successfully parsed: " + file.getName());
+
+            // Apply each security rule
+            for (SecurityRule rule : rules) {
+                List<Issue> issues = rule.analyze(cu, file.getName());
+                if (!issues.isEmpty()) {
+                    System.out.println("⚠️ Issues found in " + file.getName() + ": " + issues.size());
                     allIssues.addAll(issues);
                 }
+            }
 
-                // Optional: run taint analysis
-                List<Issue> taintIssues = taintAnalysisEngine.runTaintAnalysis(cu, file.getName());
+            // Run taint analysis
+            List<Issue> taintIssues = taintAnalysisEngine.runTaintAnalysis(cu, file.getName());
+            if (!taintIssues.isEmpty()) {
+                System.out.println("⚠️ Taint Issues found in " + file.getName() + ": " + taintIssues.size());
                 allIssues.addAll(taintIssues);
             }
         }
+
+        System.out.println("✅ Total Issues Found: " + allIssues.size());
         return allIssues;
     }
 
@@ -85,7 +106,7 @@ public class CodeAnalyzer {
             try {
                 format = ReportFormat.valueOf(args[1].toUpperCase());
             } catch (IllegalArgumentException e) {
-                System.err.println("Unknown report format, defaulting to JSON.");
+                System.err.println("❌ Unknown report format, defaulting to JSON.");
             }
         }
 
@@ -95,6 +116,7 @@ public class CodeAnalyzer {
         // Generate report
         ReportGenerator reportGenerator = new ReportGenerator();
         String reportOutput = reportGenerator.generateReport(issues, format);
+        System.out.println("\n📜 Final Report Output:");
         System.out.println(reportOutput);
     }
 }
